@@ -2,7 +2,7 @@
 const express = require('express');
 const app = express();
 // Express Body Parser
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Set Static File Directory
@@ -14,6 +14,7 @@ app.use(express.static(__dirname + '/public'));
  ************/
 
 const db = require('./models');
+const BooksModel = require('./models/books');
 
 /**********
  * ROUTES *
@@ -39,24 +40,27 @@ app.get('/api', (req, res) => {
     documentationUrl: '', //leave this also blank for the first exercise
     baseUrl: '', //leave this blank for the first exercise
     endpoints: [
-      {method: 'GET', path: '/api', description: 'Describes all available endpoints'},
-      {method: 'GET', path: '/api/profile', description: 'Data about me'},
-      {method: 'GET', path: '/api/books/', description: 'Get All books information'},
+      { method: 'GET', path: '/api', description: 'Describes all available endpoints' },
+      { method: 'GET', path: '/api/profile', description: 'Data about me' },
+      { method: 'GET', path: '/api/books/', description: 'Get All books information' },
       // TODO: Write other API end-points description here like above
+      { method: 'Post', path: '/api/books/', description: 'Add a new book to database' },
+      { method: 'PUT', path: '/api/books/:id', description: 'Edit information of a book' },
+      { method: 'DELETE', path: '/api/books/:id', description: 'Delete a book' }
     ]
   })
 });
 // TODO:  Fill the values
 app.get('/api/profile', (req, res) => {
   res.json({
-    'name': '',
-    'homeCountry': '',
-    'degreeProgram': '',//informatics or CSE.. etc
-    'email': '',
+    'name': 'yange',
+    'homeCountry': 'China',
+    'degreeProgram': ' Informatics',//informatics or CSE.. etc
+    'email': 'yange.zheng@tum.de',
     'deployedURLLink': '',//leave this blank for the first exercise
     'apiDocumentationURL': '', //leave this also blank for the first exercise
-    'currentCity': '',
-    'hobbies': []
+    'currentCity': 'Germany',
+    'hobbies': ['hobbiy1', 'hobbiy2']
 
   })
 });
@@ -88,10 +92,25 @@ app.post('/api/books/', (req, res) => {
    * TODO: use the books model and create a new object
    * with the information in req.body
    */
+  const {
+    title, // title of the book
+    author, // name of the first author
+    releaseDate, // release date of the book
+    genre, //like fiction or non fiction
+    rating, // rating if you have read it out of 5
+    language,// language in which the book is released
+  } = req.body;
+
+  var newBook = BooksModel({ title, author, releaseDate, genre, rating, language })
+  newBook.save(function (err) {
+    if (err) return handleError(err);
+    // saved!
+  });
+
   /*
    * return the new book information object as json
    */
-  var newBook = {};
+
   res.json(newBook);
 });
 
@@ -109,6 +128,12 @@ app.put('/api/books/:id', (req, res) => {
   /*
    * TODO: use the books model and find using the bookId and update the book information
    */
+
+  BooksModel.updateOne({ _id: bookId }, { title: bookNewData.title, author: bookNewData.author, releaseDate: bookNewData.releaseDate, genre: bookNewData.genre, rating: bookNewData.rating, language: bookNewData.language }, function (err, res) {
+    // Updated at most one doc, `res.nModified` contains the number
+    // of docs that MongoDB updated
+  });
+
   /*
    * Send the updated book information as a JSON object
    */
@@ -127,6 +152,11 @@ app.delete('/api/books/:id', (req, res) => {
    * TODO: use the books model and find using
    * the bookId and delete the book
    */
+  BooksModel.deleteOne({ _id: bookId }, function (err) {
+    if (err) return handleError(err);
+    // deleted at most one tank document
+  });
+
   /*
    * Send the deleted book information as a JSON object
    */
