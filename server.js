@@ -53,7 +53,7 @@ app.get('/api', (req, res) => {
 // TODO:  Fill the values
 app.get('/api/profile', (req, res) => {
   res.json({
-    'name': 'yange',
+    'name': 'Yange Zheng, Jiaqi Han',
     'homeCountry': 'China',
     'degreeProgram': ' Informatics',//informatics or CSE.. etc
     'email': 'yange.zheng@tum.de',
